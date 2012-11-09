@@ -54,9 +54,10 @@ class Service ():
     def publish_output (self, m):
         self.r.publish('service:{0}:channel'.format(self.service_id), m)
         
-	def publish_stderr (self, m):
-        self.r.publish('service:{0}:stderr'.format(self.service_id), m)
+	def publish_ignore (self, m):
+        self.r.publish('service:{0}:ignore'.format(self.service_id), m)
         
+
 class CounterService (Service):
     
     def init (self):
@@ -66,6 +67,7 @@ class CounterService (Service):
         self.state['data'] += 1
         print self.state['data']
         self.publish_output(self.state['data'])
+
         
 class IntegratorService (Service):
     
@@ -75,11 +77,11 @@ class IntegratorService (Service):
     def execute (self, m):
         try:
             d = int(m['d'])
+	        self.state['data'] += d
+	        print self.state['data']
+	        self.publish_output(self.state['data'])
         except:
-            d = 0
-        self.state['data'] += d
-        print self.state['data']
-        self.publish_output(self.state['data'])
+            self.publish_ignore(m['d'])
         
     
 class DifferentiatorService (Service):
@@ -94,6 +96,5 @@ class DifferentiatorService (Service):
             self.publish_output(d - self.state['prev'])
             self.state['prev'] = d    
         except:
-            pass
-        
+            self.publish_ignore(m['d'])            
         

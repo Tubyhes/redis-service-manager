@@ -54,6 +54,8 @@ class Service ():
     def publish_output (self, m):
         self.r.publish('service:{0}:channel'.format(self.service_id), m)
         
+	def publish_stderr (self, m):
+        self.r.publish('service:{0}:stderr'.format(self.service_id), m)
         
 class CounterService (Service):
     
